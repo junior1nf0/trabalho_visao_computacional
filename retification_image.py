@@ -273,3 +273,22 @@ def wrap_point(mat_hom,point):
   new_point=new_point/new_point[2];
   return new_point
 
+
+def calcular_centroide(ponto1,ponto2):
+    '''
+       TODO calcula centroide do bounding box
+    :param ponto1:
+    :param ponto2:
+    :return:
+    '''
+    return (0,0)
+
+
+def calcular_distancia(ponto1,ponto2):
+    '''
+    TODO calcula distancia entre dois pontos (euclidiana)
+    :param ponto1:
+    :param ponto2:
+    :return:
+    '''
+
