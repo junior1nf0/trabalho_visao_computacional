@@ -2,10 +2,12 @@ import numpy as np
 from skimage import feature, color, transform, io
 from skimage import exposure
 import logging as log
-from edgelets import identificarBordas, linhasDeBorda
+from bordas import identificarBordas, linhasDeBorda
 from pontoFuga import calcularVotacao, identificarPontoFuga, identificarPontoFugaOrtogonal
+from vanishing_point import compute_votes, ransac_vanishing_point, ransac_3_line
 import matplotlib.pyplot as plt
-
+from edgelets import compute_edgelets
+from retification_image import compute_homography_and_warp
 def reestimarModelo(modelo, bordas, reestimativaLimite=5):
     """Reestimate vanishing point using inliers and least squares.
     All the edgelets which are within a threshold are used to reestimate model
@@ -90,10 +92,10 @@ def calcularMatrizHomografica(imagem, vp1, vp2, cortar=True, fatorCorte=3):
     pontoProd1 = np.dot(H, vp1)
     pontoProd2 = np.dot(H, vp2)
     pontoProd1 = pontoProd1 / np.sqrt(pontoProd1[0] ** 2 + pontoProd1[1] ** 2)
-    pontoProd = pontoProd2 / np.sqrt(pontoProd2[0] ** 2 + pontoProd2[1] ** 2)
+    pontoProd2 = pontoProd2 / np.sqrt(pontoProd2[0] ** 2 + pontoProd2[1] ** 2)
 
     directions = np.array([[pontoProd1[0], -pontoProd1[0], pontoProd2[0], -pontoProd2[0]],
-                           [pontoProd[1], -pontoProd1[1], pontoProd2[1], -pontoProd2[1]]])
+                           [pontoProd1[1], -pontoProd1[1], pontoProd2[1], -pontoProd2[1]]])
 
     thetas = np.arctan2(directions[0], directions[1])
 
@@ -155,7 +157,7 @@ def calcularMatrizHomografica(imagem, vp1, vp2, cortar=True, fatorCorte=3):
 
 def exibirBordas(imagem, bordas, exibir=True):
 
-    plt.figure(tamanhoImagem=(10, 10))
+    plt.figure(figsize=(10, 10))
     plt.imshow(imagem)
     locais, direcoes, intensidades = bordas
     for i in range(locais.shape[0]):
@@ -219,7 +221,7 @@ def retificarImagem(imagem, fatorCorte=6, algoritmo='independente', reestimar=Fa
     # Compute all edgelets.
     bordas1 = identificarBordas(imagem)
 
-    #vis_edgelets(image, edgelets1) #mostrar arestas
+    exibirBordas(imagem, bordas1) #mostrar arestas
 
     if algoritmo == 'independente':
         # Find first vanishing point
@@ -227,20 +229,21 @@ def retificarImagem(imagem, fatorCorte=6, algoritmo='independente', reestimar=Fa
         if reestimar:
             vp1 = reestimarModelo(vp1, bordas1, 5)
 
-        #vis_model(image, vp1)  # Visualize the vanishing point model
+        exibirModeloCalculado(imagem, vp1)  # Visualize the vanishing point model
 
         # Remove inlier to remove dominating direction.
-        bordas2 = removerInliers(vp1, bordas1, 10)
+        bordas2 = removerInliers(vp1, bordas1)
 
         # Find second vanishing point
         vp2 = identificarPontoFuga(bordas2, 5000, limiteInlier=5)
         if reestimar:
             vp2 = reestimarModelo(vp2, bordas2, 5)
-            #vis_model(image, vp1)  # Visualize the vanishing point model
+            exibirModeloCalculado(imagem, vp2)  # Visualize the vanishing point model
 
-    #elif algoritmo == '3-linha':
-    #    comprimentoFocal = None
-    #    vp1, vp2 = identificarPontoFugaOrtogonal(bordas1, comprimentoFocal, qtdIteracoesRansac=3000, limiteInlier=5)
+    elif algoritmo == '3-linha':
+       comprimentoFocal = None
+       vp1, vp2 = identificarPontoFugaOrtogonal(bordas1, comprimentoFocal, qtdIteracoesRansac=3000, limiteInlier=5)
+
     else:
         raise KeyError(
             "O parametro algoritmo deve ser {'3-linha', 'independente'}")

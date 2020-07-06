@@ -136,7 +136,7 @@ def identificarPontoFugaOrtogonal(bordas, comprimentoFocal, qtdIteracoesRansac=2
 
         if votosAtuais > melhoresVotos:
             melhorModelo = (vp1, vp2)
-            best_votes = votosAtuais
+            melhoresVotos = votosAtuais
             log.info("O melhor modelo tem {} votos na iteração{}".format(
                 votosAtuais, ransacIteracoes))
 

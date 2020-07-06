@@ -233,7 +233,7 @@ def rectify_image(image, clip_factor=6, algorithm='independent',
     # Compute all edgelets.
     edgelets1 = compute_edgelets(image)
 
-    #vis_edgelets(image, edgelets1) #mostrar arestas
+    vis_edgelets(image, edgelets1) #mostrar arestas
 
     if algorithm == 'independent':
         # Find first vanishing point
@@ -241,7 +241,7 @@ def rectify_image(image, clip_factor=6, algorithm='independent',
         if reestimate:
             vp1 = reestimate_model(vp1, edgelets1, 5)
 
-        #vis_model(image, vp1)  # Visualize the vanishing point model
+        vis_model(image, vp1)  # Visualize the vanishing point model
 
         # Remove inlier to remove dominating direction.
         edgelets2 = remove_inliers(vp1, edgelets1, 10)

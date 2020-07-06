@@ -15,7 +15,7 @@ def identificarBordas(imagem, sigma=3):
     bordas = feature.canny(imagemEqualizada, sigma)
 
     #identifica as linhas com hough
-    linhas = transform.probabilistic_hough_line(bordas, espessura=3, intervalo=2)
+    linhas = transform.probabilistic_hough_line(bordas, line_length=3,line_gap=2)
 
     locais = []
     direcoes = []
@@ -35,7 +35,7 @@ def identificarBordas(imagem, sigma=3):
 
     #print('L= {} D= {} S={}'.format(locations, directions,strengths))
 
-    direcoes = np.array(direcoes) / np.linalg.norm(direcoes, eixo=1)[:, np.newaxis]
+    direcoes = np.array(direcoes) / np.linalg.norm(direcoes, axis=1)[:, np.newaxis]
 
     #print('L= {} D= {} S={}'.format(locations, directions,strengths))
     return (locais, direcoes, intensidades)
@@ -53,7 +53,7 @@ def linhasDeBorda(bordas):
     normais[:, 1] = -direcoes[:, 0]
 
     p = -np.sum(locais * normais, axis=1)
-    linhas = np.concatenate((normais, p[:, np.newaxis]), eixo=1)
+    linhas = np.concatenate((normais, p[:, np.newaxis]), axis=1)
     print(linhas.shape)
     return linhas
 
