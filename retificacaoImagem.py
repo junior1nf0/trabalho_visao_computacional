@@ -1,13 +1,11 @@
+import matplotlib.pyplot as plt
 import numpy as np
-from skimage import feature, color, transform, io
-from skimage import exposure
-import logging as log
+from skimage import transform, io
+
 from bordas import identificarBordas, linhasDeBorda
 from pontoFuga import calcularVotacao, identificarPontoFuga, identificarPontoFugaOrtogonal
-from vanishing_point import compute_votes, ransac_vanishing_point, ransac_3_line
-import matplotlib.pyplot as plt
-from edgelets import compute_edgelets
-from retification_image import compute_homography_and_warp
+
+
 def reestimarModelo(modelo, bordas, reestimativaLimite=5):
     """Reestimate vanishing point using inliers and least squares.
     All the edgelets which are within a threshold are used to reestimate model
@@ -219,7 +217,7 @@ def retificarImagem(imagem, fatorCorte=6, algoritmo='independente', reestimar=Fa
         imagem = io.imread(imagem)
 
     # Compute all edgelets.
-    bordas1 = identificarBordas(imagem)
+    bordas1 = identificarBordas(imagem,sigma=4)
 
     exibirBordas(imagem, bordas1) #mostrar arestas
 

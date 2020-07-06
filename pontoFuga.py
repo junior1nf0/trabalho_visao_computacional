@@ -1,9 +1,10 @@
+import logging as log
+
 import numpy as np
-from skimage import feature, color, transform, io
-from skimage import exposure
+
 from bordas import identificarBordas
 from bordas import linhasDeBorda
-import logging as log
+
 
 def calcularVotacao(bordas, modelo, limiteInlier=5):
     """

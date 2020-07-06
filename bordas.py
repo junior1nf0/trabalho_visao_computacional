@@ -1,7 +1,6 @@
 import numpy as np
-from skimage import feature, color, transform, io
 from skimage import exposure
-import logging as log
+from skimage import feature, color, transform
 
 
 def identificarBordas(imagem, sigma=3):

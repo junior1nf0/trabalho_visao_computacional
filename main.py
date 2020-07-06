@@ -3,7 +3,7 @@ from skimage import img_as_float, img_as_ubyte
 
 
 from retificacaoImagem import *
-from retification_image import *
+
 if __name__ == '__main__':
 
     figure(num=None, figsize=(8, 6), dpi=200, facecolor='w', edgecolor='k')
@@ -15,7 +15,7 @@ if __name__ == '__main__':
     # plt.plot(100,100,'r*')
     #print("Rectifying {}".format(image_name))
     nomeImagemResultado = 'resultado' + '_retificada.jpg'
-    imagemResultado, hom = retificarImagem(nomeImagem, 4)
+    imagemResultado, hom = retificarImagem(img_as_ubyte(imagem), 4)
     #imagemResultado, hom = rectify_image(nomeImagem, 4)
     #print(save_name)
 
