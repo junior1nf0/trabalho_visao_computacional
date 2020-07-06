@@ -135,7 +135,7 @@ class Yolo4(object):
         end = timer()
         print(end - start)
 
-        return image
+        return image, out_boxes, out_scores, out_classes
 
 if __name__ == '__main__':
     model_path = 'trained_weights_final.h5'
@@ -157,7 +157,7 @@ if __name__ == '__main__':
             print('Open Error! Try again!')
             continue
         else:
-            result = yolo4_model.detect_image(image, model_image_size=model_image_size)
+            result,out_boxes, out_scores, out_classes = yolo4_model.detect_image(image, model_image_size=model_image_size)
             plt.imshow(result)
             plt.show()
 
