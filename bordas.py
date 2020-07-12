@@ -7,6 +7,7 @@ def identificarBordas(imagem, sigma=3):
     """
     Identifica as bordas na imagem
     """
+
     tempMonoImg = color.rgb2gray(imagem)
     imagemEqualizada = exposure.equalize_hist(tempMonoImg)
 

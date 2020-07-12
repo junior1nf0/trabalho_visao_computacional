@@ -80,77 +80,92 @@ def calcularMatrizHomografica(imagem, vp1, vp2, cortar=True, fatorCorte=3):
     # Find Projective Transform
     linhaFuga = np.cross(vp1, vp2)
 
+    print(linhaFuga)
+    print(vp1)
+    print(vp2)
+    plt.imshow(imagem)
+    vp1n = vp1 / vp1[2]
+    plt.plot(vp1n[0], vp1n[1], 'bo')
+    vp2n = vp2 / vp2[2]
+    plt.plot(vp2n[0], vp2n[1], 'bo')
+    plt.show()
+
     H = np.eye(3)
 
     H[2] = linhaFuga / linhaFuga[2]
     H = H / H[2, 2]
+    byVanishingLine=True
+    if  byVanishingLine:
+        # Find directions corresponding to vanishing points
 
-    # Find directions corresponding to vanishing points
+        pontoProd1 = np.dot(H, vp1)
+        pontoProd2 = np.dot(H, vp2)
+        pontoProd1 = pontoProd1 / np.sqrt(pontoProd1[0] ** 2 + pontoProd1[1] ** 2)
+        pontoProd2 = pontoProd2 / np.sqrt(pontoProd2[0] ** 2 + pontoProd2[1] ** 2)
 
-    pontoProd1 = np.dot(H, vp1)
-    pontoProd2 = np.dot(H, vp2)
-    pontoProd1 = pontoProd1 / np.sqrt(pontoProd1[0] ** 2 + pontoProd1[1] ** 2)
-    pontoProd2 = pontoProd2 / np.sqrt(pontoProd2[0] ** 2 + pontoProd2[1] ** 2)
+        directions = np.array([[pontoProd1[0], -pontoProd1[0], pontoProd2[0], -pontoProd2[0]],
+                               [pontoProd1[1], -pontoProd1[1], pontoProd2[1], -pontoProd2[1]]])
 
-    directions = np.array([[pontoProd1[0], -pontoProd1[0], pontoProd2[0], -pontoProd2[0]],
-                           [pontoProd1[1], -pontoProd1[1], pontoProd2[1], -pontoProd2[1]]])
+        thetas = np.arctan2(directions[0], directions[1])
 
-    thetas = np.arctan2(directions[0], directions[1])
+        # Find direction closest to horizontal axis
+        hInd = np.argmin(np.abs(thetas))
 
-    # Find direction closest to horizontal axis
-    hInd = np.argmin(np.abs(thetas))
+        # Find positve angle among the rest for the vertical axis
+        if hInd // 2 == 0:
+            v_ind = 2 + np.argmax([thetas[2], thetas[3]])
+        else:
+            v_ind = np.argmax([thetas[2], thetas[3]])
 
-    # Find positve angle among the rest for the vertical axis
-    if hInd // 2 == 0:
-        v_ind = 2 + np.argmax([thetas[2], thetas[3]])
+        A1 = np.array([[directions[0, v_ind], directions[0, hInd], 0],
+                       [directions[1, v_ind], directions[1, hInd], 0],
+                       [0, 0, 1]])
+        # Might be a reflection. If so, remove reflection.
+        if np.linalg.det(A1) < 0:
+            A1[:, 0] = -A1[:, 0]
+
+        A = np.linalg.inv(A1)
+
+        # Translate so that whole of the image is covered
+        interMatriz = np.dot(A, H)
+        #print(A)
+        #print(inter_matrix)
+        cords = np.dot(interMatriz, [[0, 0, imagem.shape[1], imagem.shape[1]],
+                                      [0, imagem.shape[0], 0, imagem.shape[0]],
+                                      [1, 1, 1, 1]])
+        cords = cords[:2] / cords[2]
+
+        tx = min(0, cords[0].min())
+        ty = min(0, cords[1].min())
+
+        max_x = cords[0].max() - tx
+        max_y = cords[1].max() - ty
+
+        if cortar:
+            # These might be too large. Clip them.
+            maxOffset = max(imagem.shape) * fatorCorte / 2
+            tx = max(tx, -maxOffset)
+            ty = max(ty, -maxOffset)
+
+            max_x = min(max_x, -tx + maxOffset)
+            max_y = min(max_y, -ty + maxOffset)
+
+        max_x = int(max_x)
+        max_y = int(max_y)
+
+        T = np.array([[1, 0, -tx],
+                      [0, 1, -ty],
+                      [0, 0, 1]])
+        #print(T)
+        matrizHomografica = np.dot(T, interMatriz)
+
+        imagemResultante = transform.warp(imagem, np.linalg.inv(matrizHomografica))
+        # ,output_shape=(max_y, max_x))
+        return imagemResultante, matrizHomografica
     else:
-        v_ind = np.argmax([thetas[2], thetas[3]])
-
-    A1 = np.array([[directions[0, v_ind], directions[0, hInd], 0],
-                   [directions[1, v_ind], directions[1, hInd], 0],
-                   [0, 0, 1]])
-    # Might be a reflection. If so, remove reflection.
-    if np.linalg.det(A1) < 0:
-        A1[:, 0] = -A1[:, 0]
-
-    A = np.linalg.inv(A1)
-
-    # Translate so that whole of the image is covered
-    interMatriz = np.dot(A, H)
-    #print(A)
-    #print(inter_matrix)
-    cords = np.dot(interMatriz, [[0, 0, imagem.shape[1], imagem.shape[1]],
-                                  [0, imagem.shape[0], 0, imagem.shape[0]],
-                                  [1, 1, 1, 1]])
-    cords = cords[:2] / cords[2]
-
-    tx = min(0, cords[0].min())
-    ty = min(0, cords[1].min())
-
-    max_x = cords[0].max() - tx
-    max_y = cords[1].max() - ty
-
-    if cortar:
-        # These might be too large. Clip them.
-        maxOffset = max(imagem.shape) * fatorCorte / 2
-        tx = max(tx, -maxOffset)
-        ty = max(ty, -maxOffset)
-
-        max_x = min(max_x, -tx + maxOffset)
-        max_y = min(max_y, -ty + maxOffset)
-
-    max_x = int(max_x)
-    max_y = int(max_y)
-
-    T = np.array([[1, 0, -tx],
-                  [0, 1, -ty],
-                  [0, 0, 1]])
-    #print(T)
-    matrizHomografica = np.dot(T, interMatriz)
-
-    imagemResultante = transform.warp(imagem, np.linalg.inv(matrizHomografica))
-    # ,output_shape=(max_y, max_x))
-    return imagemResultante, matrizHomografica
+        imagemResultante = transform.warp(imagem, np.linalg.inv(H))
+        # ,output_shape=(max_y, max_x))
+        return imagemResultante, H
 
 
 def exibirBordas(imagem, bordas, exibir=True):
@@ -219,7 +234,7 @@ def retificarImagem(imagem, fatorCorte=6, algoritmo='independente', reestimar=Fa
     # Compute all edgelets.
     bordas1 = identificarBordas(imagem,sigma=4)
 
-    exibirBordas(imagem, bordas1) #mostrar arestas
+    #exibirBordas(imagem, bordas1) #mostrar arestas
 
     if algoritmo == 'independente':
         # Find first vanishing point
@@ -227,7 +242,7 @@ def retificarImagem(imagem, fatorCorte=6, algoritmo='independente', reestimar=Fa
         if reestimar:
             vp1 = reestimarModelo(vp1, bordas1, 5)
 
-        exibirModeloCalculado(imagem, vp1)  # Visualize the vanishing point model
+        #exibirModeloCalculado(imagem, vp1)  # Visualize the vanishing point model
 
         # Remove inlier to remove dominating direction.
         bordas2 = removerInliers(vp1, bordas1)
@@ -236,7 +251,8 @@ def retificarImagem(imagem, fatorCorte=6, algoritmo='independente', reestimar=Fa
         vp2 = identificarPontoFuga(bordas2, 5000, limiteInlier=5)
         if reestimar:
             vp2 = reestimarModelo(vp2, bordas2, 5)
-            exibirModeloCalculado(imagem, vp2)  # Visualize the vanishing point model
+
+        #exibirModeloCalculado(imagem, vp2)  # Visualize the vanishing point model
 
     elif algoritmo == '3-linha':
        comprimentoFocal = None
@@ -259,27 +275,42 @@ def propagarPonto(mat_hom,ponto):
 
     if type(ponto) is not np.ndarray:
         ponto=np.array(ponto)
-
     novoPonto=mat_hom@ponto
     novoPonto=novoPonto/novoPonto[2]
     return novoPonto
 
 
-def calcularCentroide(ponto1,ponto2):
+def recupera_base_jogador(box):
     '''
        TODO calcula centroide do bounding box
-    :param ponto1:
-    :param ponto2:
+    :param box:
     :return:
     '''
-    return (0,0)
+    top, left, bottom, right=box
+    base_jogador=((left+right)/2,bottom,1)
+    return base_jogador
 
 
-def calcularDistancia(ponto1,ponto2):
+def calcularDistancia(ponto1,ponto2,matriz):
     '''
     TODO calcula distancia entre dois pontos (euclidiana)
     :param ponto1:
     :param ponto2:
     :return:
     '''
+    ret_pon1=propagarPonto(matriz,ponto1)
+    ret_pon2 = propagarPonto(matriz, ponto2)
+    subt=ret_pon1-ret_pon2
+    dist=subt*subt
+    dist=np.sqrt(dist)
+    return dist
 
+
+if __name__ == '__main__':
+    matriz=np.eye(3)
+    pos1=np.ones(3)
+    pos2 = np.ones(3)+[4,3,0]
+    dist=calcularDistancia(pos1,pos2,matriz)
+
+    #times=['fla','vas','fla']
+    #print([i for (i,t) in enumerate(times) if t=='fla'])
