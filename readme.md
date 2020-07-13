@@ -16,7 +16,8 @@ Está sendo utilizada uma combinação de técnicas baseadas em dois artigos:
         - Calcular a distância relativa de jogadores de futebol em uma imagem em perspectiva através da matriz homográfica.
 
 ## Etapas
-Imagem original
+
+###Imagem original
 
 ![Test Image 6](imagens/jogo_mp4_950.jpg)
 
@@ -32,22 +33,26 @@ Para facilitar a identificação das bordas foi feita equalização, destacando 
 
 Foi utilizado Canny para detecção de bordas e a Transformada de Hough Probabilística para encontrar as linhas para calcular o ponto de fuga
 
-Detecção dos jogadores com YOLO4
+### Detecção dos jogadores com YOLO4
+
 ![Test Image 6](imagens/950_detec.png)
 
 Após o treinamento, é possível fazer a detecção dos jogadores para calcular o ponto que representam suas posições próximo ao plano do terreno
 
-Cálculo da distância relativa dos jogadores
+### Cálculo da distância relativa dos jogadores
+
 ![Test Image 6](imagens/950.png)
 
 Foi estipulado aleatóriamente uma distância de referência, para calcular as distâncias relativas dos demais jogadores
 
-Imagem retificada
+### Imagem retificada
+
 ![Test Image 6](imagens/950_ret.png)
 
 Após calcular a matriz homográfica geral é possível retificar a imagem
 
 ### Ambiente
+
 - matplotlib=3.0.0
 - numpy=1.14.2
 - python=3.5.6
@@ -59,6 +64,7 @@ Baixar modelo no formato h5 e colocar na raiz do projeto
 - [trained_weights_final.h5](https://drive.google.com/file/d/1qjungHMO8nIpct2ajT3wnIVOGZIYWlmC/view?usp=sharing) (modelo treinado)
 
 ### Execução
+
 python main.py
 
 ## Referência
