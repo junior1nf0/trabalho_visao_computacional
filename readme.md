@@ -1,11 +1,11 @@
 # Projeto de computação visual
-##Problema
+## Problema
 - Calcular a distância relativa de jogadores de futebol em uma imagem em perspectiva.
 
 - Não existem informações sobre calibração da câmera
 
 - Esse problema tem como premissa a existência de retas paralelas no mundo 3D visíveis na imagem em perspectiva
-##Abordagem
+## Abordagem
 
 - Para calcular distâncias de pontos em imagem em perspectiva, foi feita abordagem baseada em retificação de imagem através da matriz homográfica conforme o livro de Hartley e  Zisserman[5]
 Está sendo utilizada uma combinação de técnicas baseadas em dois artigos:
