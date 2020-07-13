@@ -83,6 +83,7 @@ def calcularMatrizHomografica(imagem, vp1, vp2, cortar=True, fatorCorte=3):
     #print(linhaFuga)
     #print(vp1)
     #print(vp2)
+    plt.suptitle('Pontos de fuga')
     plt.imshow(imagem)
     vp1n = vp1 / vp1[2]
     plt.plot(vp1n[0], vp1n[1], 'bo')

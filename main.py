@@ -74,8 +74,10 @@ if __name__ == '__main__':
                 plt.plot(x,y)
                 plt.annotate("d {:01.2f} ".format(met[3]), xy=(np.mean(x),np.mean(y)), xytext=(np.mean(x)+25,np.mean(y)+5),
                              arrowprops=dict(arrowstyle="->", connectionstyle="arc3"))
+            fig.suptitle('Distância relativa entre os jogadores')
             plt.show()
 
+            '''
             plt.imshow(imagemResultado);
             for i,novo_ponto in enumerate(pont_retif):
                 #plt.plot(novo_ponto[0], novo_ponto[1], 'b*')
@@ -83,5 +85,6 @@ if __name__ == '__main__':
                 plt.annotate("P "+str(i), xy=(novo_ponto[0], novo_ponto[1]),xytext=(novo_ponto[0], novo_ponto[1]+25),
                              arrowprops=dict(arrowstyle="->",connectionstyle="arc3"))
             plt.show()
+            '''
     yolo4_model.close_session()
 
