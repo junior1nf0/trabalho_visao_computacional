@@ -94,8 +94,8 @@ def calcularMatrizHomografica(imagem, vp1, vp2, cortar=True, fatorCorte=3):
 
     H[2] = linhaFuga / linhaFuga[2]
     H = H / H[2, 2]
-    byVanishingLine=False
-    if not byVanishingLine:
+    by_only_vanishingLine=False
+    if not by_only_vanishingLine:
         # Encontra a direção correspondente para o ponto de fuga
 
         pontoProd1 = np.dot(H, vp1)
