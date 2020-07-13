@@ -16,10 +16,22 @@ Está sendo utilizada uma combinação de técnicas baseadas em dois artigos:
         - Calcular a distância relativa de jogadores de futebol em uma imagem em perspectiva através da matriz homográfica.
 
 ### Etapas
+Imagem original
+
 ![Test Image 6](imagens/jogo_mp4_950.jpg)
+
+Equalização de histograma
+
 ![Test Image 6](imagens/950_eq_hist.png)
+
+Detectar borda com canny
+
 ![Test Image 6](imagens/950_canny.png)
+
+Cálculo de distância relativa
 ![Test Image 6](imagens/950.png)
+
+Imagem retificada
 ![Test Image 6](imagens/950_ret.png)
 
 ### Ambiente
