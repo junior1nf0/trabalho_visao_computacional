@@ -53,7 +53,7 @@ def removerInliers(modelo, bordas):
 def calcularMatrizHomografica(imagem, vp1, vp2, cortar=True, fatorCorte=3):
     """Compute homography from vanishing points and warp the image.
     It is assumed that vp1 and vp2 correspond to horizontal and vertical
-    directions, although the order is not assumed.
+    direcoes, although the order is not assumed.
     Firstly, projective transform is computed to make the vanishing points go
     to infinty so that we have a fronto parellel view. Then,Computes affine
     transfom  to make axes corresponding to vanishing points orthogonal.
@@ -80,9 +80,9 @@ def calcularMatrizHomografica(imagem, vp1, vp2, cortar=True, fatorCorte=3):
     # Find Projective Transform
     linhaFuga = np.cross(vp1, vp2)
 
-    print(linhaFuga)
-    print(vp1)
-    print(vp2)
+    #print(linhaFuga)
+    #print(vp1)
+    #print(vp2)
     plt.imshow(imagem)
     vp1n = vp1 / vp1[2]
     plt.plot(vp1n[0], vp1n[1], 'bo')
@@ -94,31 +94,32 @@ def calcularMatrizHomografica(imagem, vp1, vp2, cortar=True, fatorCorte=3):
 
     H[2] = linhaFuga / linhaFuga[2]
     H = H / H[2, 2]
-    byVanishingLine=True
-    if  byVanishingLine:
-        # Find directions corresponding to vanishing points
+    byVanishingLine=False
+    if not byVanishingLine:
+        # Encontra a direção correspondente para o ponto de fuga
 
         pontoProd1 = np.dot(H, vp1)
         pontoProd2 = np.dot(H, vp2)
         pontoProd1 = pontoProd1 / np.sqrt(pontoProd1[0] ** 2 + pontoProd1[1] ** 2)
         pontoProd2 = pontoProd2 / np.sqrt(pontoProd2[0] ** 2 + pontoProd2[1] ** 2)
 
-        directions = np.array([[pontoProd1[0], -pontoProd1[0], pontoProd2[0], -pontoProd2[0]],
+        # direcao do ponto de fuga
+        direcoes = np.array([[pontoProd1[0], -pontoProd1[0], pontoProd2[0], -pontoProd2[0]],
                                [pontoProd1[1], -pontoProd1[1], pontoProd2[1], -pontoProd2[1]]])
 
-        thetas = np.arctan2(directions[0], directions[1])
+        thetas = np.arctan2(direcoes[0], direcoes[1])
 
-        # Find direction closest to horizontal axis
+        # Encontra a direção mais proxima do eixo horizontal
         hInd = np.argmin(np.abs(thetas))
 
-        # Find positve angle among the rest for the vertical axis
+        # Encontra o angulo positivo quando o resto for zero
         if hInd // 2 == 0:
             v_ind = 2 + np.argmax([thetas[2], thetas[3]])
         else:
             v_ind = np.argmax([thetas[2], thetas[3]])
 
-        A1 = np.array([[directions[0, v_ind], directions[0, hInd], 0],
-                       [directions[1, v_ind], directions[1, hInd], 0],
+        A1 = np.array([[direcoes[0, v_ind], direcoes[0, hInd], 0],
+                       [direcoes[1, v_ind], direcoes[1, hInd], 0],
                        [0, 0, 1]])
         # Might be a reflection. If so, remove reflection.
         if np.linalg.det(A1) < 0:
@@ -294,16 +295,18 @@ def recupera_base_jogador(box):
 def calcularDistancia(ponto1,ponto2,matriz):
     '''
     TODO calcula distancia entre dois pontos (euclidiana)
-    :param ponto1:
-    :param ponto2:
-    :return:
+    :param ponto1: em  dimensao n
+    :param ponto2: em  dimensao n
+    :return: retorna a distancia euclinada e por eixo
     '''
     ret_pon1=propagarPonto(matriz,ponto1)
     ret_pon2 = propagarPonto(matriz, ponto2)
     subt=ret_pon1-ret_pon2
-    dist=subt*subt
-    dist=np.sqrt(dist)
-    return dist
+    quadrado=subt*subt
+    dist=np.sqrt(np.sum(quadrado))
+    dist_por_eixo = np.sqrt(quadrado)
+    return dist,dist_por_eixo
+
 
 
 if __name__ == '__main__':
@@ -311,6 +314,7 @@ if __name__ == '__main__':
     pos1=np.ones(3)
     pos2 = np.ones(3)+[4,3,0]
     dist=calcularDistancia(pos1,pos2,matriz)
-
+    for i in range(1, len(pos1)):
+        print(i)
     #times=['fla','vas','fla']
     #print([i for (i,t) in enumerate(times) if t=='fla'])
