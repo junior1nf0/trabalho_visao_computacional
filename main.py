@@ -48,7 +48,7 @@ if __name__ == '__main__':
             ax2.imshow(result)
             plt.show()
 
-            imagemResultado, hom = retificarImagem(img_as_ubyte(image.copy()), 4)
+            imagemResultado, hom = retificarImagem(img_as_ubyte(image.copy()), 2)
             fig, (ax1, ax2) = plt.subplots(1, 2)
             fig.suptitle('Retificacao da imagem')
             ax1.imshow(image)

@@ -72,29 +72,8 @@ def identificarPontoFuga(bordas, qtdIteracoesRansac=2000, limiteInlier=5):
 
 def identificarPontoFugaOrtogonal(bordas, comprimentoFocal, qtdIteracoesRansac=2000, limiteInlier=5):
     """ Estima ponto de fuga usando a terceira linha Ransac.
-
-    Parameters
-    ----------
-    edgelets: tuple of ndarrays
-        (locations, directions, strengths) as computed by `compute_edgelets`.
-    focal_length: float
-        Focal length of the camera used.
-    num_ransac_iter: int
-        Number of iterations to run ransac.
-    threshold_inlier: float
-        threshold to be used for computing inliers in degrees.
-    Returns
-    -------
-    vp1: ndarry of shape (3,)
-        Estimated model for first vanishing point.
-    vp2: ndarry of shape (3,)
-        Estimated model for second vanishing point, which is orthogonal to
-        first vanishing point.
-    Reference
     ---------
-    Bazin, Jean-Charles, and Marc Pollefeys. "3-line RANSAC for orthogonal
-    vanishing point detection." 2012 IEEE/RSJ International Conference on
-    Intelligent Robots and Systems. IEEE, 2012.
+    3-line RANSAC for orthogonal vanishing point detection.
     """
     locais, direcoes, intensidades = bordas
     linhas = identificarBordas(bordas)

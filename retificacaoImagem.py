@@ -7,22 +7,10 @@ from pontoFuga import calcularVotacao, identificarPontoFuga, identificarPontoFug
 
 
 def reestimarModelo(modelo, bordas, reestimativaLimite=5):
-    """Reestimate vanishing point using inliers and least squares.
-    All the edgelets which are within a threshold are used to reestimate model
-    Parameters
+    """Reestime o ponto de fuga usando inliers e mínimos quadrados.
+     Todas as edgelets que estão dentro de um limite são usadas para reestimar o modelo
     ----------
-    model: ndarry of shape (3,)
-        Vanishing point model in homogenous coordinates which is to be
-        reestimated.
-    edgelets: tuple of ndarrays
-        (locations, directions, strengths) as computed by `compute_edgelets`.
-        All edgelets from which inliers will be computed.
-    threshold_inlier: float
-        threshold to be used for finding inlier edgelets.
-    Returns
-    -------
-    restimated_model: ndarry of shape (3,)
-        Reestimated model for vanishing point in homogenous coordinates.
+    model: ponto de fuga
     """
     locais, direcoes, intensidades = bordas
 
@@ -51,38 +39,12 @@ def removerInliers(modelo, bordas):
 
 
 def calcularMatrizHomografica(imagem, vp1, vp2, cortar=True, fatorCorte=3):
-    """Compute homography from vanishing points and warp the image.
-    It is assumed that vp1 and vp2 correspond to horizontal and vertical
-    direcoes, although the order is not assumed.
-    Firstly, projective transform is computed to make the vanishing points go
-    to infinty so that we have a fronto parellel view. Then,Computes affine
-    transfom  to make axes corresponding to vanishing points orthogonal.
-    Finally, Image is translated so that the image is not missed. Note that
-    this image can be very large. `clip` is provided to deal with this.
-    Parameters
-    ----------
-    image: ndarray
-        Image which has to be wrapped.
-    vp1: ndarray of shape (3, )
-        First vanishing point in homogenous coordinate system.
-    vp2: ndarray of shape (3, )
-        Second vanishing point in homogenous coordinate system.
-    clip: bool, optional
-        If True, image is clipped to clip_factor.
-    clip_factor: float, optional
-        Proportion of image in multiples of image size to be retained if gone
-        out of bounds after homography.
-    Returns
-    -------
-    warped_img: ndarray
-        Image warped using homography as described above.
     """
-    # Find Projective Transform
+        Calcula a matriz homografica atraves dos pontos de fuga.
+    """
+
     linhaFuga = np.cross(vp1, vp2)
 
-    #print(linhaFuga)
-    #print(vp1)
-    #print(vp2)
     plt.suptitle('Pontos de fuga')
     plt.imshow(imagem)
     vp1n = vp1 / vp1[2]
@@ -122,16 +84,15 @@ def calcularMatrizHomografica(imagem, vp1, vp2, cortar=True, fatorCorte=3):
         A1 = np.array([[direcoes[0, v_ind], direcoes[0, hInd], 0],
                        [direcoes[1, v_ind], direcoes[1, hInd], 0],
                        [0, 0, 1]])
-        # Might be a reflection. If so, remove reflection.
+
         if np.linalg.det(A1) < 0:
             A1[:, 0] = -A1[:, 0]
 
         A = np.linalg.inv(A1)
 
-        # Translate so that whole of the image is covered
+        # Aplica translação para que toda imagem apareça
         interMatriz = np.dot(A, H)
-        #print(A)
-        #print(inter_matrix)
+
         cords = np.dot(interMatriz, [[0, 0, imagem.shape[1], imagem.shape[1]],
                                       [0, imagem.shape[0], 0, imagem.shape[0]],
                                       [1, 1, 1, 1]])
@@ -144,7 +105,7 @@ def calcularMatrizHomografica(imagem, vp1, vp2, cortar=True, fatorCorte=3):
         max_y = cords[1].max() - ty
 
         if cortar:
-            # These might be too large. Clip them.
+            # Imagem pode ser grande , aplica um corte como no artigo
             maxOffset = max(imagem.shape) * fatorCorte / 2
             tx = max(tx, -maxOffset)
             ty = max(ty, -maxOffset)
@@ -158,7 +119,6 @@ def calcularMatrizHomografica(imagem, vp1, vp2, cortar=True, fatorCorte=3):
         T = np.array([[1, 0, -tx],
                       [0, 1, -ty],
                       [0, 0, 1]])
-        #print(T)
         matrizHomografica = np.dot(T, interMatriz)
 
         imagemResultante = transform.warp(imagem, np.linalg.inv(matrizHomografica))
@@ -188,7 +148,6 @@ def exibirBordas(imagem, bordas, exibir=True):
 
 
 def exibirModeloCalculado(imagem, modelo, exibir=True):
-    """Helper function to visualize computed model."""
     import matplotlib.pyplot as plt
     bordas = identificarBordas(imagem)
     locais, direcoes, intensidades = bordas
@@ -209,26 +168,8 @@ def exibirModeloCalculado(imagem, modelo, exibir=True):
 
 
 def retificarImagem(imagem, fatorCorte=6, algoritmo='independente', reestimar=False):
-    """Rectified image with vanishing point computed using ransac.
-    Parameters
-    ----------
-    image: ndarray
-        Image which has to be rectified.
-    clip_factor: float, optional
-        Proportion of image in multiples of image size to be retained if gone
-        out of bounds after homography.
-    algorithm: one of {'3-line', 'independent'}
-        independent ransac algorithm finds the orthogonal vanishing points by
-        applying ransac twice.
-        3-line algorithm finds the orthogonal vanishing points together, but
-        assumes knowledge of focal length.
-    reestimate: bool
-        If ransac results are to be reestimated using least squares with
-        inlers. Turn this off if getting bad results.
-    Returns
-    -------
-    warped_img: ndarray
-        Rectified image.
+    """
+    Retifica a imagem usando os pontos de fugas encontrados com o Ransac
     """
     if type(imagem) is not np.ndarray:
         imagem = io.imread(imagem)
@@ -239,17 +180,17 @@ def retificarImagem(imagem, fatorCorte=6, algoritmo='independente', reestimar=Fa
     #exibirBordas(imagem, bordas1) #mostrar arestas
 
     if algoritmo == 'independente':
-        # Find first vanishing point
+        # Encontra o primeiro ponto de fuga
         vp1 = identificarPontoFuga(bordas1, 5000, limiteInlier=5)
         if reestimar:
             vp1 = reestimarModelo(vp1, bordas1, 5)
 
         #exibirModeloCalculado(imagem, vp1)  # Visualize the vanishing point model
 
-        # Remove inlier to remove dominating direction.
+        # Remove as linhas do ponto de fuga
         bordas2 = removerInliers(vp1, bordas1)
 
-        # Find second vanishing point
+        # Encontra o segundo ponto de fuga
         vp2 = identificarPontoFuga(bordas2, 5000, limiteInlier=5)
         if reestimar:
             vp2 = reestimarModelo(vp2, bordas2, 5)
@@ -264,8 +205,7 @@ def retificarImagem(imagem, fatorCorte=6, algoritmo='independente', reestimar=Fa
         raise KeyError(
             "O parametro algoritmo deve ser {'3-linha', 'independente'}")
 
-    # Compute the homography and warp
-    imagemResultante, matrizHomografica = calcularMatrizHomografica(imagem, vp1, vp2, cortar=False,
+    imagemResultante, matrizHomografica = calcularMatrizHomografica(imagem, vp1, vp2, cortar=True,
                                                                fatorCorte=fatorCorte)
 
     return imagemResultante, matrizHomografica
@@ -317,5 +257,3 @@ if __name__ == '__main__':
     dist=calcularDistancia(pos1,pos2,matriz)
     for i in range(1, len(pos1)):
         print(i)
-    #times=['fla','vas','fla']
-    #print([i for (i,t) in enumerate(times) if t=='fla'])
