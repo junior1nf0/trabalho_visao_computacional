@@ -33,7 +33,7 @@ Está sendo utilizada uma combinação de técnicas baseadas em dois artigos:
 Baixar modelo no formato h5 e colocar na raiz do projeto
 - [trained_weights_final.h5](https://drive.google.com/file/d/1qjungHMO8nIpct2ajT3wnIVOGZIYWlmC/view?usp=sharing) (modelo treinado)
 
-##Referência
+## Referência
 
 [Auto-Rectification of user photos](https://static.googleusercontent.com/media/research.google.com/en//pubs/archive/42532.pdf)
 
