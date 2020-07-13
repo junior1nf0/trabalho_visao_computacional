@@ -17,7 +17,7 @@ Está sendo utilizada uma combinação de técnicas baseadas em dois artigos:
 
 ## Etapas
 
-###Imagem original
+### Imagem original
 
 ![Test Image 6](imagens/jogo_mp4_950.jpg)
 
