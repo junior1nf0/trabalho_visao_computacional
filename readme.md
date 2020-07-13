@@ -40,7 +40,7 @@ Após o treinamento, é possível fazer a detecção dos jogadores para calcular
 
 
 ### Cálculo da distância relativa dos jogadores
-Foi estipulado aleatóriamente uma distância de referência, para calcular as distâncias relativas dos demais jogadores
+Foi estipulado aleatóriamente uma distância de referência, para calcular as distâncias relativas dos demais jogadores. O cálculo foi realizado considerando as posições no plano retificado
 
 ![Test Image 6](imagens/950.png)
 
