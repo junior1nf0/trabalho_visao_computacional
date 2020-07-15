@@ -1,4 +1,8 @@
-# Projeto de computação visual
+# Projeto de computação 
+## Calculando distância relativa entre jogadores
+## Alunos
+- *Erisvaldo Ferreira Marinho Junior*
+- *Wagner Luiz Oliveira dos Santos*
 ## Problema
 - Calcular a distância relativa de jogadores de futebol em uma imagem em perspectiva.
 
