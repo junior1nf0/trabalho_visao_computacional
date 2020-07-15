@@ -174,7 +174,7 @@ def retificarImagem(imagem, fatorCorte=6, reestimar=False):
     if type(imagem) is not np.ndarray:
         imagem = io.imread(imagem)
 
-    # Compute all edgelets.
+    # calculando todas as bordas
     bordas1 = identificarBordas(imagem,sigma=4)
 
     #exibirBordas(imagem, bordas1) #mostrar arestas
@@ -184,7 +184,7 @@ def retificarImagem(imagem, fatorCorte=6, reestimar=False):
     if reestimar:
         vp1 = reestimarModelo(vp1, bordas1, 5)
 
-    #exibirModeloCalculado(imagem, vp1)  # Visualize the vanishing point model
+    #exibirModeloCalculado(imagem, vp1)
 
     # Remove as linhas do ponto de fuga
     bordas2 = removerInliers(vp1, bordas1)
@@ -194,7 +194,7 @@ def retificarImagem(imagem, fatorCorte=6, reestimar=False):
     if reestimar:
         vp2 = reestimarModelo(vp2, bordas2, 5)
 
-    #exibirModeloCalculado(imagem, vp2)  # Visualize the vanishing point model
+    #exibirModeloCalculado(imagem, vp2)
 
 
 
