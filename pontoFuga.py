@@ -55,7 +55,6 @@ def identificarPontoFuga(bordas, qtdIteracoesRansac=2000, limiteInlier=5):
         modeloAtual = np.cross(l1, l2)
 
         if np.sum(modeloAtual**2) < 1 or modeloAtual[2] == 0:
-            # reject degenerate candidates
             continue
 
         votosAtuais = calcularVotacao(
@@ -66,58 +65,5 @@ def identificarPontoFuga(bordas, qtdIteracoesRansac=2000, limiteInlier=5):
             melhoresVotos = votosAtuais
             log.info("O melhor modelo tem {} votos na iteração {}".format(
                 votosAtuais.sum(), iteracaoRansac))
-
-    return melhorModelo
-
-
-def identificarPontoFugaOrtogonal(bordas, comprimentoFocal, qtdIteracoesRansac=2000, limiteInlier=5):
-    """ Estima ponto de fuga usando a terceira linha Ransac.
-    ---------
-    3-line RANSAC for orthogonal vanishing point detection.
-    """
-    locais, direcoes, intensidades = bordas
-    linhas = identificarBordas(bordas)
-
-    qtdPontos = intensidades.size
-
-    indicesOrdenados = np.argsort(-intensidades)
-    i1 = indicesOrdenados[:qtdPontos // 5]
-    i2 = indicesOrdenados[:qtdPontos // 5]
-    i3 = indicesOrdenados[:qtdPontos // 2]
-
-    melhorModelo = (None, None)
-    melhoresVotos = 0
-
-    for ransacIteracoes in range(qtdIteracoesRansac):
-        ind1 = np.random.choice(i1)
-        ind2 = np.random.choice(i2)
-        ind3 = np.random.choice(i3)
-
-        l1 = linhas[ind1]
-        l2 = linhas[ind2]
-        l3 = linhas[ind3]
-
-        vp1 = np.cross(l1, l2)
-        # linha de fuga do ponto de fuga 1
-        h = np.dot(vp1, [1 / comprimentoFocal**2, 1 / comprimentoFocal**2, 1])
-        vp2 = np.cross(h, l3)
-
-        if np.sum(vp1**2) < 1 or vp1[2] == 0:
-            # rejeita candidatos invalidos
-            continue
-
-        if np.sum(vp2**2) < 1 or vp2[2] == 0:
-            # rejeita candidatos invalidos
-            continue
-
-        vp1_votes = calcularVotacao(bordas, vp1, limiteInlier)
-        vp2_votes = calcularVotacao(bordas, vp2, limiteInlier)
-        votosAtuais = (vp1_votes > 0).sum() + (vp2_votes > 0).sum()
-
-        if votosAtuais > melhoresVotos:
-            melhorModelo = (vp1, vp2)
-            melhoresVotos = votosAtuais
-            log.info("O melhor modelo tem {} votos na iteração{}".format(
-                votosAtuais, ransacIteracoes))
 
     return melhorModelo

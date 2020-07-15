@@ -3,7 +3,7 @@ import numpy as np
 from skimage import transform, io
 
 from bordas import identificarBordas, linhasDeBorda
-from pontoFuga import calcularVotacao, identificarPontoFuga, identificarPontoFugaOrtogonal
+from pontoFuga import calcularVotacao, identificarPontoFuga
 
 
 def reestimarModelo(modelo, bordas, reestimativaLimite=5):
@@ -167,7 +167,7 @@ def exibirModeloCalculado(imagem, modelo, exibir=True):
         plt.show()
 
 
-def retificarImagem(imagem, fatorCorte=6, algoritmo='independente', reestimar=False):
+def retificarImagem(imagem, fatorCorte=6, reestimar=False):
     """
     Retifica a imagem usando os pontos de fugas encontrados com o Ransac
     """
@@ -179,31 +179,24 @@ def retificarImagem(imagem, fatorCorte=6, algoritmo='independente', reestimar=Fa
 
     #exibirBordas(imagem, bordas1) #mostrar arestas
 
-    if algoritmo == 'independente':
-        # Encontra o primeiro ponto de fuga
-        vp1 = identificarPontoFuga(bordas1, 5000, limiteInlier=5)
-        if reestimar:
-            vp1 = reestimarModelo(vp1, bordas1, 5)
+    # Encontra o primeiro ponto de fuga
+    vp1 = identificarPontoFuga(bordas1, 5000, limiteInlier=5)
+    if reestimar:
+        vp1 = reestimarModelo(vp1, bordas1, 5)
 
-        #exibirModeloCalculado(imagem, vp1)  # Visualize the vanishing point model
+    #exibirModeloCalculado(imagem, vp1)  # Visualize the vanishing point model
 
-        # Remove as linhas do ponto de fuga
-        bordas2 = removerInliers(vp1, bordas1)
+    # Remove as linhas do ponto de fuga
+    bordas2 = removerInliers(vp1, bordas1)
 
-        # Encontra o segundo ponto de fuga
-        vp2 = identificarPontoFuga(bordas2, 5000, limiteInlier=5)
-        if reestimar:
-            vp2 = reestimarModelo(vp2, bordas2, 5)
+    # Encontra o segundo ponto de fuga
+    vp2 = identificarPontoFuga(bordas2, 5000, limiteInlier=5)
+    if reestimar:
+        vp2 = reestimarModelo(vp2, bordas2, 5)
 
-        #exibirModeloCalculado(imagem, vp2)  # Visualize the vanishing point model
+    #exibirModeloCalculado(imagem, vp2)  # Visualize the vanishing point model
 
-    elif algoritmo == '3-linha':
-       comprimentoFocal = None
-       vp1, vp2 = identificarPontoFugaOrtogonal(bordas1, comprimentoFocal, qtdIteracoesRansac=3000, limiteInlier=5)
 
-    else:
-        raise KeyError(
-            "O parametro algoritmo deve ser {'3-linha', 'independente'}")
 
     imagemResultante, matrizHomografica = calcularMatrizHomografica(imagem, vp1, vp2, cortar=True,
                                                                fatorCorte=fatorCorte)

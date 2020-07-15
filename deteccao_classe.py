@@ -121,7 +121,6 @@ class Yolo4(object):
             else:
                 text_origin = np.array([left, top + 1])
 
-            # My kingdom for a good redistributable image drawing library.
             for i in range(thickness):
                 draw.rectangle(
                     [left + i, top + i, right - i, bottom - i],
