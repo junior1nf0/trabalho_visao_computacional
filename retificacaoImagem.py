@@ -10,7 +10,7 @@ def reestimarModelo(modelo, bordas, reestimativaLimite=5):
     """Reestime o ponto de fuga usando inliers e mínimos quadrados.
      Todas as edgelets que estão dentro de um limite são usadas para reestimar o modelo
     ----------
-    model: ponto de fuga
+    modelo: ponto de fuga
     """
     locais, direcoes, intensidades = bordas
 
@@ -122,11 +122,11 @@ def calcularMatrizHomografica(imagem, vp1, vp2, cortar=True, fatorCorte=3):
         matrizHomografica = np.dot(T, interMatriz)
 
         imagemResultante = transform.warp(imagem, np.linalg.inv(matrizHomografica))
-        # ,output_shape=(max_y, max_x))
+
         return imagemResultante, matrizHomografica
     else:
         imagemResultante = transform.warp(imagem, np.linalg.inv(H))
-        # ,output_shape=(max_y, max_x))
+
         return imagemResultante, H
 
 
