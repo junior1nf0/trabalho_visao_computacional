@@ -33,11 +33,10 @@ def identificarBordas(imagem, sigma=3):
     direcoes = np.array(direcoes)
     intensidades = np.array(intensidades)
 
-    #print('L= {} D= {} S={}'.format(locations, directions,strengths))
 
     direcoes = np.array(direcoes) / np.linalg.norm(direcoes, axis=1)[:, np.newaxis]
 
-    #print('L= {} D= {} S={}'.format(locations, directions,strengths))
+
     return (locais, direcoes, intensidades)
 
 
@@ -47,7 +46,7 @@ def linhasDeBorda(bordas):
     """
 
     locais, direcoes, _ = bordas
-    # print('D {} shape{}'.format(directions,directions.shape))
+
     normais = np.zeros_like(direcoes)
     normais[:, 0] = direcoes[:, 1]
     normais[:, 1] = -direcoes[:, 0]
