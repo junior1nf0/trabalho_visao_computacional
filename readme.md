@@ -1,5 +1,5 @@
 # Projeto de computação 
-## Calculando distância relativa entre jogadores
+## Calculando distância relativa entre jogadores.
 ## Alunos
 - *Erisvaldo Ferreira Marinho Junior*
 - *Wagner Luiz Oliveira dos Santos*
